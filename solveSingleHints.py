@@ -2,8 +2,12 @@ from sudoku import Sudoku, Cell, getHints
 from copy import deepcopy
 from typing import List
 
-# Used to solve single hints. If only one cell in the region has a given possible value
-# that cell must be that value. Also attemps to solve any naked singles present.
+# Solves single hints.
+# 
+# If only one cell in the region has a hint that others don't, that cell must be the hint value. 
+# 
+# Also attempts to solve any naked singles present.
+
 class SolveSingleHints:
 
     def __init__(self, sudoku: Sudoku):
@@ -33,6 +37,7 @@ class SolveSingleHints:
 
         for cell in region:
             if (len(cell.hints) == 1):
+                # Naked single with only one hint. Must be that value.
                 cell.setValue(cell.hints.pop())
                 solved = True
 
@@ -45,19 +50,19 @@ class SolveSingleHints:
         return solved
 
     def __solveSingleHint(self, section: List[Cell]):
-        '''Attemps to solve by checking if a cell has a hint that is not present elsewhere in the row/column/block.'''
         solved = False
 
         for i in range(len(section)):
             cell = section[i]
 
             hints = set(cell.hints)
-            others = deepcopy(section)
-            del others[i]
+            otherCells = deepcopy(section)
+            del otherCells[i]
 
-            othersHints = set(getHints(others))
-            myHint = hints.difference(othersHints)
+            # The set difference between all other hints present in the region.
+            myHint = hints.difference(set(getHints(otherCells)))
 
+            # If there is a hint here, it means this cell is the only one with that hint.
             if (len(myHint) == 1):
                 cell.setValue(myHint.pop())
                 solved = True

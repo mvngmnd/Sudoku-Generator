@@ -15,9 +15,6 @@ class Cell:
             self.setValue(value)
             self.intial = True
 
-    def getValue(self):
-        return self.value
-
     def setValue(self, value: int, printLog = False):
         self.value = value
         self.hints = set([])
@@ -124,7 +121,7 @@ def getValues(items):
     vals = []
     for item in items:
         if isinstance(item, Cell):
-            vals.append(item.getValue())
+            vals.append(item.value)
         elif isinstance(item, list):
             for val in getValues(item):
                 vals.append(val)
