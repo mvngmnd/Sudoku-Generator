@@ -2,7 +2,7 @@ from sudoku import Sudoku, Cell, getValues, getHints
 from copy import deepcopy
 from typing import List
 
-from removePairedHints import *
+from removeNakedSubsets import RemoveNakedSubsets
 from solveSingleHints import *
 
 class SudokuSolver:
@@ -10,7 +10,7 @@ class SudokuSolver:
     def __init__(self, sudoku: Sudoku):
         self.sudoku = sudoku
         
-        self.runSolveStrategiesClassLoop([SolveSingleHints, RemovePairedHints, SolveSingleHints])
+        self.runSolveStrategiesClassLoop([SolveSingleHints, RemoveNakedSubsets, SolveSingleHints])
 
     def setHints(self):
         sudoku = self.sudoku

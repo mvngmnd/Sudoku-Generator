@@ -1,29 +1,35 @@
 from typing import List
 from sudoku import Sudoku, Cell
 
-# Used to remove paired hints. For instance, if {2,7} is present twice in a region
-# remove 2 and 7 from the other cells hints, as this is a 2,7 pair.
-class RemovePairedHints:
+# Removes naked subsets.
+# 
+# For instance, if {2,7} is present twice in a region
+# remove 2,7 from the other cells hints, as this is a 2,7 pair.
+#
+# Likewise, if {1,3,6} is present three times in a region
+# remove 1,3,6 from the other cells hints, as this is a 1,3,6 triple.
+
+class RemoveNakedSubsets:
 
     def __init__(self, sudoku: Sudoku):
         self.sudoku = sudoku
 
     def run(self):
         removed = False
-        removed |= self.removeRegionsPairedHints(self.sudoku.getBlocks())
-        removed |= self.removeRegionsPairedHints(self.sudoku.getRows())
-        removed |= self.removeRegionsPairedHints(self.sudoku.getColumns())
+        removed |= self.removeRegionsNakedSubsets(self.sudoku.getBlocks())
+        removed |= self.removeRegionsNakedSubsets(self.sudoku.getRows())
+        removed |= self.removeRegionsNakedSubsets(self.sudoku.getColumns())
         return removed
 
-    def removeRegionsPairedHints(self, regions):
+    def removeRegionsNakedSubsets(self, regions):
         removed = False
 
         for region in regions:
-            removed |= self.__removeRegionPairedHints(region)
+            removed |= self.__removeRegionNakedSubsets(region)
 
         return removed
 
-    def __removeRegionPairedHints(self, section: List[Cell]):
+    def __removeRegionNakedSubsets(self, section: List[Cell]):
         hintsFound = []
         removedHint = False
 
@@ -40,11 +46,10 @@ class RemovePairedHints:
                     innerHint.append((cell.hints))
 
             # A hint is only unique if there are the same number present.
-            # IE if {2,7} matched above once, its in the list, so add it.
-            # IE if {3,4,5} match above twice, its in the list, so add it.
+            # IE if {2,7} matched above once, add it.
+            # IE if {1,3,6} matches twice, add it.
 
-            hints = [x for x in innerHint if innerHint.count(x) == len(x)-1]
-            for hint in hints:
+            for hint in [x for x in innerHint if innerHint.count(x) == len(x)-1]:
                 if (not hintsFound.__contains__(hint)):
                     hintsFound.append(hint)
         
