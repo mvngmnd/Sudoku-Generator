@@ -43,7 +43,8 @@ class SudokuSolver:
             for x in range(0,9):
                 b1 = sudoku1.getRow(y)[x]
                 b2 = sudoku2.getRow(y)[x]
-                if (b1.solved != b2.solved):
+
+                if (b1.solved != b2.solved or set(b1.hints) != set(b2.hints)):
                     return True
         return False
 
