@@ -1,35 +1,37 @@
 from typing import List
+
 from sudoku import Sudoku, Cell
 
 # Removes naked subsets.
 # 
-# For instance, if {2,7} is present twice in a region
+# For instance, if {2,7} is present twice in a section
 # remove 2,7 from the other cells hints, as this is a 2,7 pair.
 #
-# Likewise, if {1,3,6} is present three times in a region
+# Likewise, if {1,3,6} is present three times in a section
 # remove 1,3,6 from the other cells hints, as this is a 1,3,6 triple.
 
 class RemoveNakedSubsets:
 
-    def __init__(self, sudoku: Sudoku):
+    def __init__(self, sudoku: Sudoku, logging = False):
         self.sudoku = sudoku
+        self.logging = logging
 
     def run(self):
         removed = False
-        removed |= self.removeRegionsNakedSubsets(self.sudoku.getBlocks())
-        removed |= self.removeRegionsNakedSubsets(self.sudoku.getRows())
-        removed |= self.removeRegionsNakedSubsets(self.sudoku.getColumns())
+        removed |= self.removeSectionsNakedSubsets(self.sudoku.getRows())
+        removed |= self.removeSectionsNakedSubsets(self.sudoku.getColumns())
+        removed |= self.removeSectionsNakedSubsets(self.sudoku.getBlocks())
         return removed
 
-    def removeRegionsNakedSubsets(self, regions):
+    def removeSectionsNakedSubsets(self, sections):
         removed = False
 
-        for region in regions:
-            removed |= self.__removeRegionNakedSubsets(region)
+        for section in sections:
+            removed |= self.__removeSectionNakedSubsets(section)
 
         return removed
 
-    def __removeRegionNakedSubsets(self, section: List[Cell]):
+    def __removeSectionNakedSubsets(self, section: List[Cell]):
         hintsFound = []
         removedHint = False
 
@@ -60,6 +62,7 @@ class RemoveNakedSubsets:
             for cell in section:
                 if (cell.hints == hintSet or cell.solved): continue
                 for hint in hintSet:
-                    cell.removeHint(hint)
+                    cell.removeHint(hint, self.__class__.__name__, self.logging)
+                    removedHint = True
 
         return removedHint

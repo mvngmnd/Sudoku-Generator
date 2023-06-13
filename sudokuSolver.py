@@ -1,21 +1,26 @@
-from sudoku import Sudoku, Cell, getValues, getHints
 from copy import deepcopy
-from typing import List
 
+from sudoku import Sudoku
+
+from removePointingPairs import RemovePointingPairs
 from removeNakedSubsets import RemoveNakedSubsets
-from solveSingleHints import *
+from removeHiddenPairs import RemoveHiddenPairs
+
+from solveSingleHints import SolveSingleHints
 
 class SudokuSolver:
 
-    def __init__(self, sudoku: Sudoku):
+    def __init__(self, sudoku: Sudoku, logging = False):
         self.sudoku = sudoku
+        self.logging = logging
         
-        self.runSolveStrategiesClassLoop([RemoveNakedSubsets, SolveSingleHints])
+        self.runSolveStrategiesClassLoop([SolveSingleHints, RemoveNakedSubsets, RemovePointingPairs, RemoveHiddenPairs])
 
     def runSolveStrategiesClassLoop(self, strategies):
-        for strategy in strategies:
-            obj = strategy(self.sudoku)
-            self.__runSolveStrategyLoop(obj.run)
+        while(not self.sudoku.isSolved()):
+            for strategy in strategies:
+                obj = strategy(self.sudoku, self.logging)
+                self.__runSolveStrategyLoop(obj.run)
 
     def runSolveStrategiesLoop(self, strategies):
         for strategy in strategies:
@@ -37,7 +42,6 @@ class SudokuSolver:
     def __runSolveStrategyLoop(self, strategy):
         while(self.__runSolveStrategy(strategy)):
             continue
-        return False
 
     def __runSolveStrategy(self, strategy):
         self.sudoku.setHints()
