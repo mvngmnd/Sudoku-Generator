@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 from colorama import Fore, Style
 from typing import List
@@ -6,13 +8,16 @@ from datetime import datetime
 
 class Cell:
 
-    def __init__(self, value: int):
+    def __init__(self, value: int, sudoku: Sudoku):
         self.hints = set([1,2,3,4,5,6,7,8,9])
         self.value = 0
         self.solved = False
         self.intial = False
+        self.sudoku = sudoku
         if (value != 0):
-            self.setValue(value)
+            self.value = value
+            self.hints = set([])
+            self.solved = True
             self.intial = True
 
     def setValue(self, value: int, printLog = False):
@@ -21,6 +26,7 @@ class Cell:
         self.solved = True
         if (printLog):
             print("Guess made", datetime.now())
+        self.sudoku.setHints()
 
     def removeHint(self, value: int, printLog = False):
         if (self.hints.__contains__(value)):
@@ -39,9 +45,26 @@ class Sudoku:
         for row in rows:
             parsedCells = []
             for value in row:
-                cell = Cell(value)
+                cell = Cell(value, self)
                 parsedCells.append(cell)
             self.rows.append(parsedCells)
+
+    def setHints(self):
+        sudoku = self
+        for block in sudoku.getBlocks():
+            vals = set(getValues(block))
+            for cell in block:
+                cell.removeHints(vals)
+        
+        for row in sudoku.getRows():
+            vals = set(getValues(row))
+            for cell in row:
+                cell.removeHints(vals)
+
+        for col in sudoku.getColumns():
+            vals = set(getValues(col))
+            for cell in col:
+                cell.removeHints(vals)
 
     def isSolved(self):
         for row in self.getRows():

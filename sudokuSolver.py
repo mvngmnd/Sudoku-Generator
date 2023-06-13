@@ -10,24 +10,7 @@ class SudokuSolver:
     def __init__(self, sudoku: Sudoku):
         self.sudoku = sudoku
         
-        self.runSolveStrategiesClassLoop([SolveSingleHints, RemoveNakedSubsets, SolveSingleHints])
-
-    def setHints(self):
-        sudoku = self.sudoku
-        for block in sudoku.getBlocks():
-            vals = set(getValues(block))
-            for cell in block:
-                cell.removeHints(vals)
-        
-        for row in sudoku.getRows():
-            vals = set(getValues(row))
-            for cell in row:
-                cell.removeHints(vals)
-
-        for col in sudoku.getColumns():
-            vals = set(getValues(col))
-            for cell in col:
-                cell.removeHints(vals)
+        self.runSolveStrategiesClassLoop([RemoveNakedSubsets, SolveSingleHints])
 
     def runSolveStrategiesClassLoop(self, strategies):
         for strategy in strategies:
@@ -57,8 +40,8 @@ class SudokuSolver:
         return False
 
     def __runSolveStrategy(self, strategy):
-        self.setHints()
+        self.sudoku.setHints()
         boardCopy = deepcopy(self.sudoku)
         strategy()
-        self.setHints()
+        self.sudoku.setHints()
         return self.boardHasChanged(boardCopy, self.sudoku)
